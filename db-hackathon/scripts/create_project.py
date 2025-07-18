@@ -17,9 +17,11 @@ def main():
     print("--- Create a New Project ---")
     name = input("Project name: ")
     description = input("Project description: ")
-    amount_needed = int(input("Amount needed (in wei): "))
+    amount_needed = int(input("Amount needed (in INR): "))
     profit_share = int(input("Profit share percentage (1-100): "))
 
     tx = contract.createProject(name, description, amount_needed, profit_share, {"from": account})
     tx.wait(1)
     print("Project created! Transaction hash:", tx.txid)
+
+

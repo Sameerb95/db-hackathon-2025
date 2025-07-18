@@ -11,13 +11,17 @@ with open("deployed_contracts.txt", "r") as f:
         raise Exception("AgroFundConnect address not found in deployed_contracts.txt")
 
 def main():
-    account = accounts[4]
+    account = accounts[2]
     contract = AgroFundConnect.at(contract_address)
 
     print("--- Invest in a Project ---")
     project_id = int(input("Project ID: "))
-    amount = int(input("Amount to invest (in wei): "))
+    amount = int(input("Amount to invest (in INR): "))
+    amount_in_wei = contract.inrToWei(amount)
 
-    tx = contract.invest(project_id, amount, {"from": account, "value": amount})
+    tx = contract.invest(project_id, amount_in_wei, {"from": account, "value": amount_in_wei})
     tx.wait(1)
     print("Investment successful! Transaction hash:", tx.txid)
+
+
+    

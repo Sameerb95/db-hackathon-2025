@@ -16,4 +16,5 @@ def main():
     print(f"Total projects: {count}")
     for i in range(count):
         details = contract.getProject(i)
-        print(f"\nProject ID: {i}\n  Name: {details[1]}\n  Farmer: {details[0]}\n  Needed: {details[3]}\n  Raised: {details[4]}\n  Completed: {details[6]}") 
+        print(details)
+        print(f"\nProject ID: {i}\n  Name: {details[1]}\n  Farmer: {details[0]}\n  Needed: {details[5]}\n  Raised: {details[6]}\n  Completed: {details[8]}") 

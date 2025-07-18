@@ -11,11 +11,16 @@ contract AgroFundConnect {
         uint256 amountRaised;          // Current amount of Ether raised
         uint256 profitSharePercentage; // Percentage of profit promised to investors (e.g., 10 for 10%)
         bool completed;                // True if project has reached its funding goal
-        mapping(address => uint256) investors; // Mapping of investor address to their invested amount
-        address[] investorAddresses;   // Array to keep track of unique investor addresses
     }
 
     Project[] public projects; // Array of all funding projects
+
+    // Mapping from projectId => investor address => invested amount
+    mapping(uint256 => mapping(address => uint256)) public investorAmounts;
+    // Mapping from projectId => array of investor addresses
+    mapping(uint256 => address[]) public investorAddresses;
+    // Mapping to check if an address is already an investor for a project
+    mapping(uint256 => mapping(address => bool)) public isInvestor;
 
     event ProjectCreated(
         uint256 indexed projectId,
@@ -29,6 +34,7 @@ contract AgroFundConnect {
         uint256 amount
     );
     event ProjectFunded(uint256 indexed projectId);
+    event ProfitsDisbursed(uint256 indexed projectId, uint256 totalProfit);
 
     /**
      * @dev Creates a new funding project request.
@@ -44,22 +50,21 @@ contract AgroFundConnect {
         uint256 _profitSharePercentage
     ) public {
         require(_amountNeeded > 0, "Amount needed must be greater than zero.");
+        require(_amountNeeded > 0, "Amount needed in INR must be greater than zero.");
         require(_profitSharePercentage > 0 && _profitSharePercentage <= 100, "Profit share must be between 1 and 100.");
 
-        // Directly create a new Project struct in storage by pushing to the array
-        uint256 projectId = projects.length; // Get the ID for the new project
-        projects.push(); // Add a new empty element to the storage array
-        Project storage newProject = projects[projectId]; // Get a reference to the newly created storage struct
+        _amountNeeded = inrToWei(_amountNeeded);
 
-        newProject.farmer = payable(msg.sender);
-        newProject.name = _name;
-        newProject.description = _description;
-        newProject.amountNeeded = _amountNeeded;
-        newProject.amountRaised = 0;
-        newProject.profitSharePercentage = _profitSharePercentage;
-        newProject.completed = false;
-        // Mapping 'investors' is implicitly initialized in storage.
-        newProject.investorAddresses = new address[](0); // Initialize empty array
+        uint256 projectId = projects.length;
+        projects.push(Project({
+            farmer: payable(msg.sender),
+            name: _name,
+            description: _description,
+            amountNeeded: _amountNeeded,
+            amountRaised: 0,
+            profitSharePercentage: _profitSharePercentage,
+            completed: false
+        }));
 
         emit ProjectCreated(
             projectId,
@@ -78,13 +83,16 @@ contract AgroFundConnect {
         Project storage project = projects[_projectId];
         require(!project.completed, "Project is already funded.");
         require(_amount > 0, "Investment amount must be greater than zero.");
-        // require(msg.sender != project.farmer, "Farmer cannot invest in their own project.");
+        require(msg.sender != project.farmer, "Farmer cannot invest in their own project.");
+
+        require(msg.value == _amount, "Sent Ether must match the investment amount.");
 
         // Record the investment
-        if (project.investors[msg.sender] == 0) {
-            project.investorAddresses.push(msg.sender); // Add investor to the list if new
+        if (!isInvestor[_projectId][msg.sender]) {
+            investorAddresses[_projectId].push(msg.sender);
+            isInvestor[_projectId][msg.sender] = true;
         }
-        project.investors[msg.sender] += _amount;
+        investorAmounts[_projectId][msg.sender] += _amount;
         project.amountRaised += _amount;
 
         emit FundsInvested(_projectId, msg.sender, msg.value);
@@ -93,24 +101,55 @@ contract AgroFundConnect {
         if (project.amountRaised >= project.amountNeeded) {
             project.completed = true;
             emit ProjectFunded(_projectId);
-            // In a real app, funds would be transferred to the farmer here.
-            // For simplicity, we'll just mark it funded.
-            // project.farmer.transfer(project.amountRaised); // This would send all collected funds
+            // Transfer funds to the farmer
+            project.farmer.transfer(project.amountRaised);
         }
     }
 
-/**
- * @dev Retrieves details of a specific project.
- * @param _projectId The ID of the project.
- * @return farmer - Address of the farmer requesting funds,
-                    name - Name of the project (e.g., "Organic Wheat Harvest"),
-                    description - Detailed description of the project,
-                    amountNeeded - Total amount of Ether needed for the project,
-                    amountRaised - Current amount of Ether raised,
-                    profitSharePercentage - Percentage of profit promised to investors (e.g., 10),
-                    completed - True if project has reached its funding goal.
- */
+    /**
+     * @dev Disburses profits to all investors based on their share and the project's profit share percentage.
+     * The farmer must send the total profit amount as msg.value.
+     * @param _projectId The ID of the project.
+     */
+    function disburseProfits(uint256 _projectId) public payable {
+        require(_projectId < projects.length, "Project does not exist.");
+        Project storage project = projects[_projectId];
+        require(msg.sender == project.farmer, "Only the farmer can disburse profits.");
+        require(project.completed, "Project must be completed to disburse profits.");
+        require(address(this).balance > 0, "No profit to disburse.");
 
+        uint256 totalInvested = project.amountRaised;
+        uint256 totalProfit = msg.value;
+        uint256 profitShare = project.profitSharePercentage;
+        address[] storage investors = investorAddresses[_projectId];
+
+        for (uint256 i = 0; i < investors.length; i++) {
+            address payable investor = payable(investors[i]);
+            uint256 invested = investorAmounts[_projectId][investor];
+            if (invested > 0) {
+                // Calculate the investor's share of the profit
+                uint256 investorProfit = (totalProfit * invested * profitShare) / (totalInvested * 100);
+                if (investorProfit > 0) {
+                    investor.transfer(investorProfit);
+                }
+            }
+        }
+        emit ProfitsDisbursed(_projectId, totalProfit);
+    }
+
+    /**
+     * @dev Retrieves details of a specific project.
+     * @param _projectId The ID of the project.
+     * @return farmer - Address of the farmer requesting funds,
+                        name - Name of the project (e.g., "Organic Wheat Harvest"),
+                        description - Detailed description of the project,
+                        amountNeeded - Total amount of Ether needed for the project,
+                        amountRaised - Current amount of Ether raised,
+                        amountNeeded_INR - Total amount of INR needed for the project,
+                        amountRaised_INR - Current amount of INR raised,
+                        profitSharePercentage - Percentage of profit promised to investors (e.g., 10),
+                        completed - True if project has reached its funding goal.
+     */
     function getProject(uint256 _projectId)
         public
         view
@@ -120,21 +159,29 @@ contract AgroFundConnect {
             string memory description,
             uint256 amountNeeded,
             uint256 amountRaised,
+            uint256 amountNeeded_INR,
+            uint256 amountRaised_INR,
             uint256 profitSharePercentage,
             bool completed
         )
     {
         require(_projectId < projects.length, "Project does not exist.");
         Project storage project = projects[_projectId];
+        amountNeeded_INR = weiToINR(project.amountNeeded);
+        amountRaised_INR = weiToINR(project.amountRaised);
+
         return (
-            project.farmer,
-            project.name,
-            project.description,
-            project.amountNeeded,
-            project.amountRaised,
-            project.profitSharePercentage,
-            project.completed
+            project.farmer,         // 0
+            project.name,           // 1
+            project.description,    // 2
+            project.amountNeeded,   // 3
+            project.amountRaised,   // 4
+            amountNeeded_INR,       // 5
+            amountRaised_INR,       // 6
+            project.profitSharePercentage, // 7
+            project.completed        // 8
         );
+            
     }
 
     /**
@@ -153,7 +200,28 @@ contract AgroFundConnect {
      */
     function getInvestorAmountInProject(uint256 _projectId, address _investor) public view returns (uint256) {
         require(_projectId < projects.length, "Project does not exist.");
-        Project storage project = projects[_projectId];
-        return project.investors[_investor];
+        return investorAmounts[_projectId][_investor];
     }
+
+    /**
+     * @dev Converts an INR amount to WEI using the fixed rate: 1 ETH = 1000 INR.
+     * @param inrAmount The amount in INR.
+     * @return weiAmount The equivalent amount in WEI.
+     */
+    function inrToWei(uint256 inrAmount) public pure returns (uint256 weiAmount) {
+        // 1 ETH = 1e18 WEI = 1000 INR
+        // So, WEI = (inrAmount * 1e18) / 1000
+        return (inrAmount * 1e18) / 1000;
+    }
+
+    /**
+     * @dev Converts a WEI amount to INR using the fixed rate: 1 ETH = 1000 INR.
+     * @param weiAmount The amount in WEI.
+     * @return inrAmount The equivalent amount in INR.
+     */
+    function weiToINR(uint256 weiAmount) public pure returns (uint256 inrAmount) {
+        // 1 ETH = 1e18 WEI = 1000 INR
+        // So, INR = (weiAmount * 1000) / 1e18
+        return (weiAmount * 1000) / 1e18;
+    }   
 }
