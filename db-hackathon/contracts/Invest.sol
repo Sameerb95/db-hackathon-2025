@@ -106,35 +106,16 @@ contract AgroFundConnect {
         }
     }
 
-    /**
+    /*
      * @dev Disburses profits to all investors based on their share and the project's profit share percentage.
      * The farmer must send the total profit amount as msg.value.
-     * @param _projectId The ID of the project.
      */
-    function disburseProfits(uint256 _projectId) public payable {
-        require(_projectId < projects.length, "Project does not exist.");
-        Project storage project = projects[_projectId];
-        require(msg.sender == project.farmer, "Only the farmer can disburse profits.");
-        require(project.completed, "Project must be completed to disburse profits.");
-        require(address(this).balance > 0, "No profit to disburse.");
-
-        uint256 totalInvested = project.amountRaised;
-        uint256 totalProfit = msg.value;
-        uint256 profitShare = project.profitSharePercentage;
-        address[] storage investors = investorAddresses[_projectId];
-
-        for (uint256 i = 0; i < investors.length; i++) {
-            address payable investor = payable(investors[i]);
-            uint256 invested = investorAmounts[_projectId][investor];
-            if (invested > 0) {
-                // Calculate the investor's share of the profit
-                uint256 investorProfit = (totalProfit * invested * profitShare) / (totalInvested * 100);
-                if (investorProfit > 0) {
-                    investor.transfer(investorProfit);
-                }
+    function disburseProfits(address investor , uint256 investorProfit) public payable {
+            {
+                    payable(investor).transfer(investorProfit);
             }
-        }
-        emit ProfitsDisbursed(_projectId, totalProfit);
+            
+        emit ProfitsDisbursed(0, investorProfit);
     }
 
     /**
