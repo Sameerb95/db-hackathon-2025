@@ -11,7 +11,7 @@ with open("deployed_contracts.txt", "r") as f:
         raise Exception("AgroFundConnect address not found in deployed_contracts.txt")
 
 def main():
-    account = accounts[2]
+    account = accounts[5]
     contract = AgroFundConnect.at(contract_address)
 
     print("--- Invest in a Project ---")
