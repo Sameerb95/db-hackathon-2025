@@ -4,14 +4,14 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-class ProjectRequest(BaseModel):
+class CreateProjectRequest(BaseModel):
     project_name: str
     project_description: str
     amount_needed: int
     profit_share: int
 
 @app.post("/create_project/")
-def create_project(request: ProjectRequest):
+def create_project(request: CreateProjectRequest):
     try:
         # Prepare the command to run the create_project.py script
         command = [
