@@ -3,7 +3,7 @@ import argparse
 
 from scripts.utils import get_contract_address_from_file
 
-def create_project():
+def main():
     parser = argparse.ArgumentParser(description="Create a new project on AgroFundConnect")
     parser.add_argument("--project_name", type=str, help="Project name", required=True)
     parser.add_argument("--project_description", type=str, help="Project description", required=True)
@@ -27,4 +27,4 @@ def create_project():
     print("Project created! Transaction hash:", tx.txid)
 
 if __name__ == "__main__":
-    create_project()
+    main()

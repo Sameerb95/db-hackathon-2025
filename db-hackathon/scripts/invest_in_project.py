@@ -3,7 +3,7 @@ import argparse
 
 from scripts.utils import get_contract_address_from_file
 
-def invest_in_project():
+def main():
     parser = argparse.ArgumentParser(description="Invest in a project on AgroFundConnect")
     parser.add_argument("--project_id", type=int, help="Project ID to invest in", required=True)
     parser.add_argument("--amount", type=int, help="Amount to invest (in INR)", required=True)
@@ -24,7 +24,4 @@ def invest_in_project():
     print("Investment successful! Transaction hash:", tx.txid)
 
 if __name__ == "__main__":
-    invest_in_project()
-
-
-    
+    main()    

@@ -1,5 +1,6 @@
 from brownie import AgroFundConnect, accounts
 
+from scripts.utils import get_contract_address_from_file
 
 def get_investors_for_project(contract, project_id):  
     
@@ -72,14 +73,7 @@ def get_account_balance(contract, account):
 def main():
     account = accounts[0]
     
-    with open("deployed_contracts.txt", "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith("AgroFundConnect:"):
-                contract_address = line.split(":")[1].strip()
-                break
-        else:
-            raise Exception("AgroFundConnect address not found in deployed_contracts.txt")
+    contract_address = get_contract_address_from_file()
     
     contract = AgroFundConnect.at(contract_address)
 
@@ -111,7 +105,7 @@ def main():
     if not completed:
         print("❌ Project is not yet completed")
         print("❌ Cannot disburse profits until project is funded")
-        return
+        raise Exception("Strike: Project is not yet completed")
 
     print("\n=== Starting Profit Disbursement ===")
     
@@ -126,4 +120,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
