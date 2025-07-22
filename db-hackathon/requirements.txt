@@ -1,2 +1,4 @@
-eth-brownie==1.21.0
+# eth-brownie==1.21.0
 fastapi==0.116.1
+requests==2.31.0
+SQLAlchemy==2.0.30

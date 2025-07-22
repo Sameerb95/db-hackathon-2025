@@ -5,8 +5,11 @@ from backend.routers import (
     disburse_amount,
     get_projects,
 )
+from backend.database import create_tables
 
 app = FastAPI()
+
+create_tables()
 
 app.include_router(
     create_project.router, prefix="/create_project", tags=["create_project"]
