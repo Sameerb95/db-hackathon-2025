@@ -1,4 +1,4 @@
-from brownie import AgroFundConnect, accounts
+from brownie import accounts
 
 from scripts.utils import get_contract_address_from_file
 
@@ -37,6 +37,8 @@ def get_investors_with_amounts(contract, project_id):
 
 def disburse_profits_to_investors(contract, project_id, total_profit_inr, amount_raised_inr, account):
 
+    account_address = accounts.at(account, force=True)
+
     investor_data = get_investors_with_amounts(contract, project_id)
     
     if not investor_data:
@@ -58,7 +60,7 @@ def disburse_profits_to_investors(contract, project_id, total_profit_inr, amount
             print(f"  Profit Share:  {investor_profit} INR")
                 
             try:
-                account.transfer(investor, investor_profit_wei)
+                account_address.transfer(investor, investor_profit_wei)
                 print(f"  ✅ Profit disbursed ")
             except Exception as e2:
                 print(f"  ❌ transfer failed: {e2}")
@@ -66,18 +68,16 @@ def disburse_profits_to_investors(contract, project_id, total_profit_inr, amount
             print()  
 
 def get_account_balance(contract, account):
-    balance = account.balance()
+    acc=accounts.at(account, force=True)
+    balance = acc.balance()
     balance_inr = contract.weiToINR(balance)
     return balance_inr
 
-def main():
-    account = accounts[0]
-    
-    contract_address = get_contract_address_from_file()
-    
-    contract = AgroFundConnect.at(contract_address)
-
-    project_id = 0
+def main(project_id):
+    project_id = int(project_id)
+    contract, account = get_contract_address_from_file()
+    print(contract)
+    print(account)
     project = contract.getProject(project_id)
 
     farmer = project[0]
@@ -118,5 +118,3 @@ def main():
     print(f"Final wallet balance: {final_balance} INR ")
     print(f"Amount spent on profits: {wallet_balance - final_balance} INR")
 
-if __name__ == "__main__":
-    main()

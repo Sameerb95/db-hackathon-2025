@@ -1,30 +1,32 @@
-from brownie import AgroFundConnect, accounts
+# from brownie import AgroFundConnect, accounts
+from brownie import project, network, accounts
 
-def get_contract_address_from_file(filename = "deployed_contracts.txt"):
-     # Helper to get deployed contract address
-    with open(filename, "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            if line.startswith("AgroFundConnect:"):
-                contract_address = line.split(":")[1].strip()
-                return contract_address
+def get_contract_address_from_file(contract_name="AgroFundConnect",filename = "deployed_contracts.txt"):
+
+        if project.get_loaded_projects():
+            p = project.get_loaded_projects()[0]
         else:
-            raise Exception("AgroFundConnect address not found in deployed_contracts.txt")
+            p = project.load('.', name="AgroFundProject")
+            p.load_config()
+        if not network.is_connected():
+            network.connect('ganache') 
         
-def get_projects_count():
-    # Helper to get the count of projects
-    account = accounts[0]
-    with open("deployed_contracts.txt", "r") as f:
-        contract_address = f.read().split(":")[1].strip()
-    contract = AgroFundConnect.at(contract_address)
+        with open(filename, "r") as f:
+            for line in f:
+                if line.startswith(f"{contract_name}:"):
+                    contract_address = line.split(":")[1].strip().split(" ")[0]
+                    account = line.split(":")[1].strip().split(" ")[1]
+                    break
+            else:
+                raise Exception(f"{contract_name} address not found in {filename}")
 
-    # Now call functions as above
-    count = contract.getProjectsCount()
-    return count
+        ContractClass = getattr(p, contract_name)
+        return ContractClass.at(contract_address),account
+    
 
 def get_projects() -> list[dict]:
-    contract_address = get_contract_address_from_file()
-    contract = AgroFundConnect.at(contract_address)
+    contract, _ = get_contract_address_from_file()
+    print(contract)
     count = contract.getProjectsCount()
     projects = [contract.getProject(i) for i in range(count)]
 
@@ -41,9 +43,8 @@ def get_projects() -> list[dict]:
 
     return projects_details_list
 
-def get_project_details(project_id: int) -> dict:
-    contract_address = get_contract_address_from_file()
-    contract = AgroFundConnect.at(contract_address)
+def get_details(project_id: int) -> dict:
+    contract, _ = get_contract_address_from_file()
     details = contract.getProject(project_id)
 
     return {
@@ -57,3 +58,7 @@ def get_project_details(project_id: int) -> dict:
     }
 
 
+
+def get_count():
+    contract, _ = get_contract_address_from_file()
+    return contract.getProjectsCount()
