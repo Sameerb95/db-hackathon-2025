@@ -47,6 +47,7 @@ class Farmer(Base):
     confidence_score = Column(Integer)
     state = Column(String)
     city = Column(String)
+    password_hash = Column(String)
 
 class Investor(Base):
     __tablename__ = "investors"
@@ -58,6 +59,7 @@ class Investor(Base):
     contract_address = Column(String, index=True)
     total_investments = Column(Integer)
     total_investments_repaid = Column(Integer)
+    password_hash = Column(String)
 
 class Transaction(Base):
     __tablename__ = "transactions"
