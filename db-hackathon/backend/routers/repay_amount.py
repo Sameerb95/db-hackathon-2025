@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 import subprocess
 from pydantic import BaseModel
+from backend.services.farmer_service import FarmerService
+from backend.services.project_service import ProjectService
 
 router = APIRouter()
 
@@ -21,9 +23,6 @@ def repay_amount(request: DisburseAmountRequest):
             print(result.stdout.strip())
             raise Exception(f"Error disbursing amount: {result.stderr.strip()}")
 
-        # After successful disbursement, update confidence score for the farmer
-        # We need to get the farmer_aadhar_id for the project_id
-        from backend.services.project_service import ProjectService
         project_service = ProjectService()
         farmer_aadhar_id = project_service.get_farmer_aadhar_id_by_project_id(request.project_id)
 

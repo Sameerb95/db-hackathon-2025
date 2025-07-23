@@ -7,6 +7,7 @@ from backend.services.transaction_service import TransactionService
 router = APIRouter()
 
 class InvestProjectRequest(BaseModel):
+    farmer_aadhar_id: str
     project_id: int
     amount: int
     investor_account: int 
@@ -31,7 +32,7 @@ def invest_in_project(request: InvestProjectRequest):
             raise Exception(f"Error investing in project: {result.stderr.strip()}")
         transaction_id = result.stdout.strip()    
         transaction_service.create_transaction(transaction_id,farmer_aadhar_id, request.investor_account, request.amount, request.project_id)
-        project_service.invest_in_project(request.project_id, request.amount)
+        project_service.invest_in_project(request.project_id, request.amount, farmer_aadhar_id)
         return {"message": "Investment successful!","transaction_hash": result.stdout.split("Investment successful! Transaction hash:")[1].strip()}
     except Exception as e:
         return {"error": str(e)}

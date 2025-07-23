@@ -10,8 +10,8 @@ class ProjectRepository:
         self.db.refresh(project)
         return project
     
-    def get_project_by_id(self, project_id: int):
-        return self.db.query(Project).filter(Project.project_id == project_id).first()
+    def get_project_by_id(self, farmer_aadhar_id: str, project_id: int):
+        return self.db.query(Project).filter(Project.farmer_aadhar_id == farmer_aadhar_id, Project.project_id == project_id).first()
     
     def get_all_active_projects(self):
         return self.db.query(Project).filter(Project.is_active == True).order_by(Project.amount_needed.desc()).all()
@@ -25,8 +25,8 @@ class ProjectRepository:
     def get_project_by_crop_type(self, crop_type: str):
         return self.db.query(Project).filter(Project.crop_type == crop_type).all()
     
-    def update_project(self,project_id:int,data:dict):
-        project = self.get_project_by_id(project_id)
+    def update_project(self,project_id:int,farmer_aadhar_id:str,data:dict):
+        project = self.get_project_by_id(farmer_aadhar_id, project_id)
         if project:
             for key, value in data.items():
                 setattr(project, key, value)

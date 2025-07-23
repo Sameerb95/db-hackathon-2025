@@ -25,8 +25,8 @@ class ProjectService:
         )
         return self.project_repository.add_project(project)
     
-    def invest_in_project(self, project_id: int, amount: int):
-        project = self.get_project_by_id(project_id)
+    def invest_in_project(self, project_id: int, amount: int, farmer_aadhar_id: str):
+        project = self.get_project_by_id(project_id, farmer_aadhar_id)
         if project:
             if project.is_active:
                 project.amount_needed -= amount
@@ -49,13 +49,11 @@ class ProjectService:
             return False
 
 
-        
-
     def get_all_active_projects(self):
         return self.project_repository.get_all_active_projects()
     
-    def get_project_by_id(self, project_id: int):
-        return self.project_repository.get_project_by_id(project_id)
+    def get_project_by_id(self, farmer_aadhar_id: str, project_id: int):
+        return self.project_repository.get_project_by_id(farmer_aadhar_id, project_id)
 
     def get_farmer_aadhar_id_by_project_id(self, project_id: int):
         return self.project_repository.get_farmer_aadhar_id_by_project_id(project_id) 
