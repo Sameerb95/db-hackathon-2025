@@ -1,27 +1,22 @@
-from brownie import AgroFundConnect, accounts, network
+from brownie import accounts, network
 
-# Helper to get deployed contract address
-with open("deployed_contracts.txt", "r") as f:
-    lines = f.readlines()
-    for line in lines:
-        if line.startswith("AgroFundConnect:"):
-            contract_address = line.split(":")[1].strip()
-            break
-    else:
-        raise Exception("AgroFundConnect address not found in deployed_contracts.txt")
+from scripts.utils import get_contract_address_from_file
 
-def main():
-    account = accounts[0]
-    contract = AgroFundConnect.at(contract_address)
+def main(project_name, project_description, amount_needed, profit_share):
 
-    print("--- Create a New Project ---")
-    name = input("Project name: ")
-    description = input("Project description: ")
-    amount_needed = int(input("Amount needed (in INR): "))
-    profit_share = int(input("Profit share percentage (1-100): "))
+    contract_address,account_address = get_contract_address_from_file()
+    print(contract_address)
+    print(account_address)
+    account = account_address
+ 
 
-    tx = contract.createProject(name, description, amount_needed, profit_share, {"from": account})
+    print(project_name, project_description, amount_needed, profit_share)
+
+    tx = contract_address.createProject(project_name, project_description, amount_needed, profit_share, {"from": account})
+    print(tx)
     tx.wait(1)
+
     print("Project created! Transaction hash:", tx.txid)
 
+    return tx.txid
 
