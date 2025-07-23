@@ -1,11 +1,14 @@
 from backend.repositories.farmer_repository import FarmerRepository
 from backend.database import Farmer
+import subprocess
+import sys
 
 class FarmerService:
     def __init__(self):
         self.farmer_repository = FarmerRepository()
 
     def create_farmer(self, data):
+        self.contract_address, self.wallet_address = self.deploy_contract_and_get_address()
         farmer = Farmer(
             aadhar_id=data['aadhar_id'],
             name=data['name'],
@@ -32,4 +35,26 @@ class FarmerService:
     def get_all_farmers(self):
         return self.farmer_repository.get_all_farmers()
 
+
+    def deploy_contract_and_get_address(self):
+        """
+        Deploys a new contract using deploy.py and returns the contract address.
+        """
+        idx = 0 
+        command = [
+            "brownie", "run", "scripts/deploy.py", "main",
+            str(idx),
+            "--network", "ganache"
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise Exception(f"Error deploying contract: {result.stderr.strip()}")
+        output = result.stdout.strip()
+        contract_address, wallet_address = output.split(",")
+        return contract_address, wallet_address
+        
+        
+    
+  
+    
     

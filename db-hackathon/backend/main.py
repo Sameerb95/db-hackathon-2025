@@ -5,6 +5,7 @@ from backend.routers import (
     repay_amount,
     get_projects,
     user_auth,
+    deploy_contract,
 )
 from backend.database import create_tables
 
@@ -24,4 +25,7 @@ app.include_router(
 app.include_router(get_projects.router, prefix="/get_projects", tags=["get_projects"])
 app.include_router(
     user_auth.router, prefix="/auth", tags=["auth"]
+)
+app.include_router(
+    deploy_contract.router, prefix="/deploy_contract", tags=["deploy_contract"]
 )

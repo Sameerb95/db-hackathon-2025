@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import traceback
 from backend.repositories.project_repository import ProjectRepository
 from backend.database import Project
+from backend.services.project_service import ProjectService
 
 router = APIRouter()
 
@@ -31,17 +32,19 @@ def create_project(request: CreateProjectRequest):
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode != 0:
             raise Exception(f"Error creating project: {result.stderr.strip()}")
-        project_repository = ProjectRepository()
-        project_repository.add_project(Project(
-            name=request.name,
-            description=request.description,
-            amount_needed=request.amount_needed,
-            interest_rate=request.interest_rate,
-            farmer_aadhar_id=request.farmer_aadhar_id,
-            duration_in_months=request.duration_in_months,
-            crop_type=request.crop_type,
-            land_area=request.land_area
-        ))
+        # Use ProjectService to add the project to the database
+        project_service = ProjectService()
+        project_data = {
+            'name': request.name,
+            'description': request.description,
+            'amount_needed': request.amount_needed,
+            'interest_rate': request.interest_rate,
+            'farmer_aadhar_id': request.farmer_aadhar_id,
+            'duration_in_months': request.duration_in_months,
+            'crop_type': request.crop_type,
+            'land_area': request.land_area
+        }
+        project_service.create_project(project_data)
         return {"message": "Project created successfully!", "transaction_hash": result.stdout.split("Project created!")[1].strip()}
     except Exception as e:
         return {"error": str(e)}

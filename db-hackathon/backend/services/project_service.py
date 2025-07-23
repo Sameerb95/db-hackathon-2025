@@ -32,3 +32,6 @@ class ProjectService:
     def get_project_by_crop_type(self, crop_type: str):
         return self.project_repository.get_project_by_crop_type(crop_type)
     
+    def mark_project_completed(self, project_id: int):
+        return self.project_repository.update_project_completion(project_id)
+    

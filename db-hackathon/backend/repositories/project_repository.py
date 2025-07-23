@@ -22,4 +22,13 @@ class ProjectRepository:
     def get_project_by_crop_type(self, crop_type: str):
         return self.db.query(Project).filter(Project.crop_type == crop_type).all()
     
+    def update_project_completion(self, project_id: int):
+        project = self.get_project_by_id(project_id)
+        if project:
+            project.is_active = False
+            project.amount_repaid_yn = True
+            self.db.commit()
+            self.db.refresh(project)
+        return project
+    
         
