@@ -20,7 +20,16 @@ def repay_amount(request: DisburseAmountRequest):
             print(result.stderr.strip() )
             print(result.stdout.strip())
             raise Exception(f"Error disbursing amount: {result.stderr.strip()}")
-            
+
+        # After successful disbursement, update confidence score for the farmer
+        # We need to get the farmer_aadhar_id for the project_id
+        from backend.services.project_service import ProjectService
+        project_service = ProjectService()
+        farmer_aadhar_id = project_service.get_farmer_aadhar_id_by_project_id(request.project_id)
+
+        farmer_service = FarmerService()
+        updated_score = farmer_service.update_confidence_score(farmer_aadhar_id, increment=5)
+
         return {"message": "Amount disbursed successfully!", "transaction_hash": result.stdout.strip()}
     except Exception as e:
         return {"error": str(e)}

@@ -23,7 +23,7 @@ class FarmerService:
             total_loans_remaining=0,
             total_loans_defaulted=0,
             average_interest_rate=0,
-            confidence_score=0,
+            confidence_score=40,
             state=data['state'],
             city=data['city']
         )
@@ -53,7 +53,8 @@ class FarmerService:
         contract_address, wallet_address = output.split(",")
         return contract_address, wallet_address
         
-        
+    def update_confidence_score(self, aadhar_id: str):
+        return self.farmer_repository.update_confidence_score(aadhar_id)
     
   
     
