@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, create_engine, Column, Integer, String
+from sqlalchemy import Boolean, DateTime, create_engine, Column, Integer, String, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -17,7 +17,10 @@ Base = declarative_base()
 # Define your schema (models) here
 class Project(Base):
     __tablename__ = "projects"
-    project_id = Column(Integer, primary_key=True, index=True)
+    __table_args__ = (
+        PrimaryKeyConstraint('farmer_aadhar_id', 'project_id'),
+    )
+    project_id = Column(Integer)
     name = Column(String, index=True)
     description = Column(String)
     amount_needed = Column(Integer)
