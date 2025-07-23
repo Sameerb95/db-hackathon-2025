@@ -21,6 +21,6 @@ def main(contract_address,wallet_address,project_name, project_description, amou
     tx.wait(1)
     # Get the latest project ID (assuming it's count - 1)
     project_id = contract.getProjectsCount() - 1
-    print(project_id)  # Print only the project ID
+    logging.info(f"Project ID: {project_id}")
     return project_id
 
