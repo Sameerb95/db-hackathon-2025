@@ -36,8 +36,8 @@ class ProjectService:
                     project.amount_repaid_yn = True
                     farmer_aadhar_id = self.get_farmer_aadhar_id_by_project_id(project_id)
                     farmer = self.farmer_repository.get_farmer_by_id(farmer_aadhar_id)
-                    farmer.total_loans += 1
-                    farmer.total_loans_remaining += 1
+                    farmer.total_loans_remaining -= 1
+                    farmer.total_loans_repaid -= 1
                     self.farmer_repository.update_farmer(farmer_aadhar_id, {'total_loans': farmer.total_loans, 'total_loans_remaining': farmer.total_loans_remaining})
                     self.project_repository.update_project(project_id, {'is_active': project.is_active, 'amount_repaid_yn': project.amount_repaid_yn})
                     return True
