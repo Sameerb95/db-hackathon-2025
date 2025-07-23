@@ -49,15 +49,6 @@ class Farmer(Base):
     city = Column(String)
     password_hash = Column(String)
 
-class Investor(Base):
-    __tablename__ = "investors"
-    aadhar_id = Column(String, primary_key=True, index=True)
-    name = Column(String, index=True)
-    email = Column(String, index=True)
-    phone = Column(String, index=True)
-    wallet_address = Column(String, index=True)
-    contract_address = Column(String, index=True)
-    password_hash = Column(String)
 
 class Transaction(Base):
     __tablename__ = "transactions"

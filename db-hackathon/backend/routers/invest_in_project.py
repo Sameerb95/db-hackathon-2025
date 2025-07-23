@@ -2,7 +2,6 @@ from fastapi import APIRouter
 import subprocess
 from pydantic import BaseModel
 import traceback
-from backend.services.investor_service import InvestorService
 from backend.services.project_service import ProjectService
 from backend.services.transaction_service import TransactionService
 router = APIRouter()
