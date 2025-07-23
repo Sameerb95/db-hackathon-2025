@@ -69,3 +69,6 @@ class ProjectService:
     def mark_project_completed(self, project_id: int):
         return self.project_repository.update_project_completion(project_id)
     
+    def get_next_project_id(self, farmer_aadhar_id: str):
+        return self.project_repository.get_next_project_id(farmer_aadhar_id)
+    

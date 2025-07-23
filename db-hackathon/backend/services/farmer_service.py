@@ -41,8 +41,6 @@ class FarmerService:
         return self.farmer_repository.get_all_farmers()
 
 
-
-
     def deploy_contract_and_get_address(self):
         """
         Deploys a new contract using deploy.py and returns the contract address.
