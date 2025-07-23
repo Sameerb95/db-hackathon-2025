@@ -2,7 +2,9 @@ from fastapi import APIRouter
 import subprocess
 from pydantic import BaseModel
 import traceback
-
+from backend.services.investor_service import InvestorService
+from backend.services.project_service import ProjectService
+from backend.services.transaction_service import TransactionService
 router = APIRouter()
 
 class InvestProjectRequest(BaseModel):
@@ -13,6 +15,10 @@ class InvestProjectRequest(BaseModel):
 @router.post("/")
 def invest_in_project(request: InvestProjectRequest):
     try:
+        project_service = ProjectService()
+        farmer_aadhar_id = project_service.get_farmer_aadhar_id_by_project_id(request.project_id)
+        transaction_service = TransactionService()
+
         command = [
             "brownie", "run", "scripts/invest_in_project.py", "main",
             str(request.project_id),
@@ -24,6 +30,7 @@ def invest_in_project(request: InvestProjectRequest):
         if result.returncode != 0:
             print(traceback.format_exc())
             raise Exception(f"Error investing in project: {result.stderr.strip()}")
+        transaction_service.create_transaction(farmer_aadhar_id, request.investor_account, request.amount, request.project_id)
         return {"message": "Investment successful!","transaction_hash": result.stdout.split("Investment successful! Transaction hash:")[1].strip()}
     except Exception as e:
         return {"error": str(e)}
