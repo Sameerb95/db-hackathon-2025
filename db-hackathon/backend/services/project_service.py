@@ -25,10 +25,16 @@ class ProjectService:
     
     def get_project_by_id(self, project_id: int):
         return self.project_repository.get_project_by_id(project_id)
+
+    def get_farmer_aadhar_id_by_project_id(self, project_id: int):
+        return self.project_repository.get_farmer_aadhar_id_by_project_id(project_id) 
     
     def get_project_by_farmer_aadhar_id(self, farmer_aadhar_id: str):
         return self.project_repository.get_project_by_farmer_aadhar_id(farmer_aadhar_id)
     
     def get_project_by_crop_type(self, crop_type: str):
         return self.project_repository.get_project_by_crop_type(crop_type)
+    
+    def mark_project_completed(self, project_id: int):
+        return self.project_repository.update_project_completion(project_id)
     

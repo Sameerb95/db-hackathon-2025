@@ -49,17 +49,6 @@ class Farmer(Base):
     city = Column(String)
     password_hash = Column(String)
 
-class Investor(Base):
-    __tablename__ = "investors"
-    aadhar_id = Column(String, primary_key=True, index=True)
-    name = Column(String, index=True)
-    email = Column(String, index=True)
-    phone = Column(String, index=True)
-    wallet_address = Column(String, index=True)
-    contract_address = Column(String, index=True)
-    total_investments = Column(Integer)
-    total_investments_repaid = Column(Integer)
-    password_hash = Column(String)
 
 class Transaction(Base):
     __tablename__ = "transactions"
@@ -74,79 +63,3 @@ class Transaction(Base):
 # Create the tables in the database
 def create_tables():
     Base.metadata.create_all(bind=engine)
-
-class ProjectRepository:
-    def __init__(self):
-        self.db = SessionLocal()
-
-    def add_project(self, project: Project):
-        self.db.add(project)
-        self.db.commit()
-        self.db.refresh(project)
-        return project
-
-    def get_by_id(self, project_id: int):
-        return self.db.query(Project).filter(Project.project_id == project_id).first()
-
-    def get_all(self):
-        return self.db.query(Project).all()
-
-    def close(self):
-        self.db.close()
-
-class FarmerRepository:
-    def __init__(self):
-        self.db = SessionLocal()
-
-    def add_farmer(self, farmer: Farmer):
-        self.db.add(farmer)
-        self.db.commit()
-        self.db.refresh(farmer)
-        return farmer
-
-    def get_by_id(self, aadhar_id: str):
-        return self.db.query(Farmer).filter(Farmer.aadhar_id == aadhar_id).first()
-
-    def get_all(self):
-        return self.db.query(Farmer).all()
-
-    def close(self):
-        self.db.close()
-
-class InvestorRepository:
-    def __init__(self):
-        self.db = SessionLocal()
-
-    def add_investor(self, investor: Investor):
-        self.db.add(investor)
-        self.db.commit()
-        self.db.refresh(investor)
-        return investor
-
-    def get_by_id(self, aadhar_id: str):
-        return self.db.query(Investor).filter(Investor.aadhar_id == aadhar_id).first()
-
-    def get_all(self):
-        return self.db.query(Investor).all()
-
-    def close(self):
-        self.db.close()
-
-class TransactionRepository:
-    def __init__(self):
-        self.db = SessionLocal()
-
-    def add_transaction(self, transaction: Transaction):
-        self.db.add(transaction)
-        self.db.commit()
-        self.db.refresh(transaction)
-        return transaction
-
-    def get_by_id(self, transaction_id: int):
-        return self.db.query(Transaction).filter(Transaction.transaction_id == transaction_id).first()
-
-    def get_all(self):
-        return self.db.query(Transaction).all()
-
-    def close(self):
-        self.db.close()
