@@ -5,14 +5,14 @@ import traceback
 from backend.repositories.project_repository import ProjectRepository
 from backend.database import Project
 from backend.services.project_service import ProjectService
-
+from backend.services.farmer_service import FarmerService
 router = APIRouter()
 
 class CreateProjectRequest(BaseModel):
-    name: str
-    description: str
+    project_name: str
+    project_description: str
     amount_needed: int
-    interest_rate: int
+    profit_share: int
     farmer_aadhar_id: str
     duration_in_months: int
     crop_type: str
@@ -20,11 +20,16 @@ class CreateProjectRequest(BaseModel):
 
 @router.post("/")
 def create_project(request: CreateProjectRequest):
+    farmer_service = FarmerService()
+    contract_address, wallet_address = farmer_service.get_farmer_contract_address(request.farmer_aadhar_id)
+
     try:
         command = [
             "brownie", "run", "scripts/create_project.py", "main",
-                request.name,
-                request.description,
+                str(contract_address),
+                str(wallet_address),
+                str(request.project_name),
+                str(request.project_description),
                 str(request.amount_needed),
                 str(request.interest_rate),
                 "--network", "ganache"

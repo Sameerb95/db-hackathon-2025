@@ -4,9 +4,10 @@ from backend.routers import (
     invest_in_project,
     repay_amount,
     get_projects,
-    user_auth,
-    deploy_contract,
-)
+    login,
+    register
+    )
+
 from backend.database import create_tables
 
 app = FastAPI()
@@ -22,10 +23,14 @@ app.include_router(
 app.include_router(
     repay_amount.router, prefix="/disburse_amount", tags=["disburse_amount"]
 )
-app.include_router(get_projects.router, prefix="/get_projects", tags=["get_projects"])
 app.include_router(
-    user_auth.router, prefix="/auth", tags=["auth"]
+    get_projects.router, prefix="/get_projects", tags=["get_projects"]
 )
+
 app.include_router(
-    deploy_contract.router, prefix="/deploy_contract", tags=["deploy_contract"]
+    register.router, prefix="/register", tags=["register"]
+)
+
+app.include_router(
+    login.router, prefix="/login", tags=["login"]
 )

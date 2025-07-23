@@ -61,7 +61,7 @@ class ProjectService:
         return self.project_repository.get_farmer_aadhar_id_by_project_id(project_id) 
     
     def get_project_by_farmer_aadhar_id(self, farmer_aadhar_id: str):
-        return self.project_repository.get_project_by_farmer_aadhar_id(farmer_aadhar_id)
+        return self.project_repository.get_projects_by_farmer_aadhar_id(farmer_aadhar_id)
     
     def get_project_by_crop_type(self, crop_type: str):
         return self.project_repository.get_project_by_crop_type(crop_type)
