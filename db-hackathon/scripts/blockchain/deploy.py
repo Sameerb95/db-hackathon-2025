@@ -8,5 +8,7 @@ def main():
         "from" : main_account
     })
 
-    with open("deployed_contracts.txt", "a") as f:
-        f.write(f"AgroFundConnect: {ss.address} \t {main_account}\n")
+    print(f"Contract deployed to {ss.address}")
+    print(f"Main account is {main_account}")
+
+    return ss.address,main_account

@@ -18,5 +18,5 @@ def main(project_name, project_description, amount_needed, profit_share):
 
     print("Project created! Transaction hash:", tx.txid)
 
-    return tx.txid
+    return project_name,project_description,amount_needed,profit_share,tx.txid
 

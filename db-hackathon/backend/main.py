@@ -4,6 +4,7 @@ from backend.routers import (
     invest_in_project,
     disburse_amount,
     get_projects,
+    deploy_contract,
 )
 
 app = FastAPI()
@@ -18,3 +19,4 @@ app.include_router(
     disburse_amount.router, prefix="/disburse_amount", tags=["disburse_amount"]
 )
 app.include_router(get_projects.router, prefix="/get_projects", tags=["get_projects"])
+app.include_router(deploy_contract.router, prefix="/deploy_contract", tags=["deploy_contract"])
