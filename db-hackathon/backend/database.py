@@ -32,6 +32,7 @@ class Project(Base):
 
 class Farmer(Base):
     __tablename__ = "farmers"
+    ganache_idx = Column(Integer, primary_key=True, index=True)
     aadhar_id = Column(String, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, index=True)
@@ -47,7 +48,7 @@ class Farmer(Base):
     confidence_score = Column(Integer)
     state = Column(String)
     city = Column(String)
-    password_hash = Column(String)
+    password_hash = Column(String, nullable=False)
 
 
 class Transaction(Base):
