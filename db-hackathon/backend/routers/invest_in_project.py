@@ -14,7 +14,7 @@ class InvestProjectRequest(BaseModel):
 def invest_in_project(request: InvestProjectRequest):
     try:
         command = [
-            "brownie", "run", "scripts/invest_in_project.py", "main",
+            "brownie", "run", "scripts/blockchain/invest_in_project.py", "main",
             str(request.project_id),
             str(request.amount),
             str(request.investor_account),

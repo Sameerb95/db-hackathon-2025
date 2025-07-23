@@ -11,7 +11,7 @@ class DisburseAmountRequest(BaseModel):
 def disburse_amount(request: DisburseAmountRequest):
     try:
         command = [
-            "brownie", "run", "scripts/disburse_amount.py", "main",
+            "brownie", "run", "scripts/blockchain/disburse_amount.py", "main",
             str(request.project_id),
             "--network", "ganache"
         ]

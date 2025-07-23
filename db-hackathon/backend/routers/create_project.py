@@ -15,7 +15,7 @@ class CreateProjectRequest(BaseModel):
 def create_project(request: CreateProjectRequest):
     try:
         command = [
-            "brownie", "run", "scripts/create_project.py", "main",
+            "brownie", "run", "scripts/blockchain/create_project.py", "main",
                 request.project_name,
                 request.project_description,
                 str(request.amount_needed),
