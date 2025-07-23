@@ -33,5 +33,16 @@ class ProjectRepository:
             self.db.commit()
             self.db.refresh(project)
         return project
+
+    def update_project(self,project_id:int,data:dict):
+        project = self.get_project_by_id(project_id)
+        if project:
+            for key, value in data.items():
+                setattr(project, key, value)
+            self.db.commit()
+            self.db.refresh(project)
+        return project
+
+
     
         

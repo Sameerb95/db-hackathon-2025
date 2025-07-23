@@ -23,18 +23,20 @@ def create_project(request: CreateProjectRequest):
     try:
         command = [
             "brownie", "run", "scripts/create_project.py", "main",
-                request.project_name,
-                request.project_description,
+                request.name,
+                request.description,
                 str(request.amount_needed),
-                str(request.profit_share),
+                str(request.interest_rate),
                 "--network", "ganache"
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode != 0:
             raise Exception(f"Error creating project: {result.stderr.strip()}")
-        # Use ProjectService to add the project to the database
+        # Parse project_id from result.stdout (should be just the project id)
+        project_id = int(result.stdout.strip())
         project_service = ProjectService()
         project_data = {
+            'project_id': project_id,
             'name': request.name,
             'description': request.description,
             'amount_needed': request.amount_needed,
@@ -45,6 +47,6 @@ def create_project(request: CreateProjectRequest):
             'land_area': request.land_area
         }
         project_service.create_project(project_data)
-        return {"message": "Project created successfully!", "transaction_hash": result.stdout.split("Project created!")[1].strip()}
+        return {"message": "Project created successfully!", "project_id": project_id}
     except Exception as e:
         return {"error": str(e)}

@@ -6,13 +6,13 @@ class TransactionService:
     def __init__(self):
         self.transaction_repository = TransactionRepository()
 
-    def create_transaction(self, data):
+    def create_transaction(self, transaction_id, farmer_aadhar_id, investor_aadhar_id, amount, project_id):
         transaction = Transaction(
-            transaction_id=1,
-            farmer_aadhar_id=data['farmer_aadhar_id'],
-            investor_aadhar_id=data['investor_aadhar_id'],
-            amount=data['amount'],
-            project_id=data['project_id'],
+            transaction_id=transaction_id,
+            farmer_aadhar_id=farmer_aadhar_id,
+            investor_aadhar_id=investor_aadhar_id,
+            amount=amount,
+            project_id=project_id,
             status="completed",
             timestamp=datetime.now()
         )

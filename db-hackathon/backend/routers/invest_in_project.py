@@ -29,7 +29,9 @@ def invest_in_project(request: InvestProjectRequest):
         if result.returncode != 0:
             print(traceback.format_exc())
             raise Exception(f"Error investing in project: {result.stderr.strip()}")
-        transaction_service.create_transaction(farmer_aadhar_id, request.investor_account, request.amount, request.project_id)
+        transaction_id = result.stdout.strip()    
+        transaction_service.create_transaction(transaction_id,farmer_aadhar_id, request.investor_account, request.amount, request.project_id)
+        project_service.invest_in_project(request.project_id, request.amount)
         return {"message": "Investment successful!","transaction_hash": result.stdout.split("Investment successful! Transaction hash:")[1].strip()}
     except Exception as e:
         return {"error": str(e)}
