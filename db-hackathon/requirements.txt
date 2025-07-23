@@ -1,2 +1,10 @@
 eth-brownie==1.21.0
 fastapi==0.116.1
+uvicorn==0.34.2
+fastmcp==2.3.4
+gemini-tool-agent==0.1.5
+fastmcp==2.3.4
+langchain-mcp-adapters==0.1.9
+langchain-google-genai==2.1.8
+langgraph==0.5.4
+langchain==0.3.26
