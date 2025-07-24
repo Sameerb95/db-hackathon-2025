@@ -25,3 +25,11 @@ def get_project_details(farmer_aadhar_id: str, project_id: int):
             return {"error": "Project not found"}
     except Exception as e:
         return {"error": str(e)}
+
+@router.get("/active_projects")
+def get_active_projects(aadhar_id:str):
+    try:
+        projects = project_service.get_all_active_projects_by_aadhar_id(aadhar_id)
+        return {"projects": projects}
+    except Exception as e:
+        return {"error": str(e)}

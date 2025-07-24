@@ -31,11 +31,14 @@ class FarmerService:
         )
         return self.farmer_repository.add_farmer(farmer)
     
-    def get_farmer_by_id(self, aadhar_id: str):
-        return self.farmer_repository.get_farmer_by_id(aadhar_id)
+    def get_farmer_by_aadhar_id(self, aadhar_id: str):
+        return self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
     
     def get_all_farmers(self):
         return self.farmer_repository.get_all_farmers()
+    
+    def get_farmer_by_aadhar_id(self, aadhar_id: str):
+        return self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
 
 
     def deploy_contract_and_get_address(self):
@@ -67,7 +70,7 @@ class FarmerService:
         return contract_address, wallet_address, idx
 
     def get_farmer_contract_address(self,aadhar_id:str):
-        farmer = self.farmer_repository.get_farmer_by_id(aadhar_id)
+        farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
         print(f"Farmer: {farmer.contract_address}")
         print(f"Farmer: {farmer.wallet_address}")
         if farmer:
@@ -77,6 +80,24 @@ class FarmerService:
         
     def update_confidence_score(self, aadhar_id: str):
         return self.farmer_repository.update_confidence_score(aadhar_id)
+
+    
+    def update_total_loans(self,aadhar_id:str,amount:int):
+        farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
+        farmer.total_loans += amount
+        self.farmer_repository.update_farmer(aadhar_id, {'total_loans': farmer.total_loans})
+
+    def update_total_loans_repaid(self,aadhar_id:str):
+        farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
+        amount_repaid = self.get_amount_repaid(aadhar_id)
+        farmer.total_loans_repaid += amount_repaid
+        self.farmer_repository.update_farmer(aadhar_id, {'total_loans_repaid': farmer.total_loans_repaid})
+
+    def get_amount_repaid(self,aadhar_id:str):
+        farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
+        return farmer.amount_raised
+
+        
     
   
     

@@ -32,10 +32,10 @@ class ProjectService:
             if project.is_active:
                 project.amount_needed -= amount
                 project.amount_raised += amount
-                self.project_repository.update_project(project_id, {'amount_needed': project.amount_needed})
+                self.project_repository.update_project(project_id,aadhar_id, {'amount_needed': project.amount_needed,'amount_raised': project.amount_raised})
                 if project.amount_needed == 0:
                     project.is_active = False
-                    self.project_repository.update_project(project_id, {'is_active': project.is_active})
+                    self.project_repository.update_project(project_id,aadhar_id, {'is_active': project.is_active})
                     return True
             else:
                 print("Project is not active")
@@ -57,6 +57,9 @@ class ProjectService:
 
     def get_all_active_projects(self):
         return self.project_repository.get_all_active_projects()
+
+    def get_all_active_projects_by_aadhar_id(self,aadhar_id:str):
+        return self.project_repository.get_all_active_projects_by_aadhar_id(aadhar_id)
     
     def get_project_by_id(self, farmer_aadhar_id: str, project_id: int):
         return self.project_repository.get_project_by_id(farmer_aadhar_id, project_id)

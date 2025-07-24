@@ -16,6 +16,9 @@ class ProjectRepository:
     def get_all_active_projects(self):
         return self.db.query(Project).filter(Project.is_active == True).order_by(Project.amount_needed.desc()).all()
 
+    def get_all_active_projects_by_aadhar_id(self,aadhar_id:str):
+        return self.db.query(Project).filter(Project.farmer_aadhar_id == aadhar_id, Project.is_active == True).order_by(Project.amount_needed.desc()).all()
+
     def get_projects_by_farmer_aadhar_id(self, farmer_aadhar_id: str):
         return self.db.query(Project).filter(Project.farmer_aadhar_id == farmer_aadhar_id).all()
 

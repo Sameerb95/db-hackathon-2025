@@ -53,6 +53,7 @@ def create_project(request: CreateProjectRequest):
                 'land_area': request.land_area
             }
             project_service.create_project(project_data)
+            farmer_service.update_total_loans(request.farmer_aadhar_id,request.amount_needed)
             return {"message": "Project created successfully!", "transaction_hash": result.stdout.split("Project created!")[1].strip()}
     except Exception as e:
         traceback.print_exc()

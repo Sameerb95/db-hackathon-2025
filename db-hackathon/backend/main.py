@@ -5,7 +5,8 @@ from backend.routers import (
     repay_amount,
     get_projects,
     login,
-    register
+    register,
+    dashboard
     )
 
 from backend.database import create_tables
@@ -33,4 +34,8 @@ app.include_router(
 
 app.include_router(
     login.router, prefix="/login", tags=["login"]
+)
+
+app.include_router(
+    dashboard.router, prefix="/dashboard", tags=["dashboard"]
 )

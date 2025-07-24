@@ -37,7 +37,8 @@ def repay_amount(request: DisburseAmountRequest):
         farmer_aadhar_id = project_service.get_farmer_aadhar_id_by_project_id(request.project_id)
 
         farmer_service = FarmerService()
-        # updated_score = farmer_service.update_confidence_score(farmer_aadhar_id, increment=5)
+        farmer_service.update_confidence_score(farmer_aadhar_id)
+        farmer_service.update_total_loans_repaid(farmer_aadhar_id,amount)
 
         return {"message": result.stdout.strip(), "transaction_hash": "1122343434354"}
     except Exception as e:

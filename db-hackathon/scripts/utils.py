@@ -1,6 +1,8 @@
 # # from brownie import AgroFundConnect, accounts
 from brownie import project, network, accounts
-# from backend.services.
+from backend.services.farmer_service import FarmerService
+
+farmer_service = FarmerService()
 
 def get_contract_address_from_file(contract_address,wallet_address):
         contract_name="AgroFundConnect"
@@ -16,6 +18,14 @@ def get_contract_address_from_file(contract_address,wallet_address):
 
         ContractClass = getattr(p, contract_name)
         return ContractClass.at(contract_address),wallet_address
+
+def get_farmer_wallet_balance(aadhar_id:str):
+    contract, account = farmer_service.get_farmer_contract_address(aadhar_id)
+    contract, account = get_contract_address_from_file(contract, account)
+    acc=accounts.at(account, force=True)
+    balance = acc.balance()
+    balance_inr = contract.weiToINR(balance)
+    return balance_inr
     
 
 # def get_activeprojects(aadhar_id:str) -> list[dict]:
