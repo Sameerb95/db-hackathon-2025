@@ -6,14 +6,28 @@ from backend.routers import (
     get_projects,
     login,
     register,
-    dashboard
+    dashboard,
+    mcp_server
     )
 
 from backend.database import create_tables
 
 app = FastAPI()
 
-create_tables()
+import os
+from brownie import project
+
+loaded_projects = project.get_loaded_projects()
+
+if loaded_projects:
+    loaded_proj = loaded_projects[0]
+else:
+    loaded_proj = project.load(os.getcwd(), name="MyProject")
+
+loaded_proj.load_config()
+
+
+
 
 app.include_router(
     create_project.router, prefix="/create_project", tags=["create_project"]
@@ -39,3 +53,4 @@ app.include_router(
 app.include_router(
     dashboard.router, prefix="/dashboard", tags=["dashboard"]
 )
+app.include_router(mcp_server.router, prefix="/mcp_server", tags=["mcp_server"])

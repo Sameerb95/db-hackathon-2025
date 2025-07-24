@@ -6,7 +6,14 @@ router = APIRouter()
 project_service = ProjectService()
 
 
-
+@router.get("/all")
+def get_all_projects():
+    try:
+        projects = project_service.get_all_active_projects()
+        return {"projects": projects}
+    except Exception as e:
+        return {"error": str(e)}
+        
 @router.get("/list")
 def get_projects_list(aadhar_id:str):
     try:

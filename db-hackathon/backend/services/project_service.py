@@ -2,6 +2,7 @@ from backend.repositories.project_repository import ProjectRepository
 from backend.database import Project
 from backend.repositories.farmer_repository import FarmerRepository
 from backend.services.transaction_service import TransactionService
+from scripts.utils import get_project_score
 
 class ProjectService:
     def __init__(self):
@@ -10,6 +11,12 @@ class ProjectService:
         self.farmer_repository = FarmerRepository()
 
     def create_project(self, data):
+        llm_required_data = {"description": data['description'],
+                             "amount_needed": data['amount_needed'], "interest_rate": data['interest_rate'],
+                             "duration_in_months": data['duration_in_months'], "crop_type": data['crop_type'],
+                             "land_area": data['land_area']}
+        llm_response = get_project_score(project_details=llm_required_data)
+
         project = Project(
             project_id=data['project_id'],
             name=data['name'],
@@ -22,7 +29,9 @@ class ProjectService:
             crop_type=data['crop_type'],
             land_area=data['land_area'],
             is_active=True,
-            amount_repaid_yn=False
+            amount_repaid_yn=False,
+            project_score=llm_response['score'],
+            score_reasoning=llm_response['reasoning']
         )
         return self.project_repository.add_project(project)
     
