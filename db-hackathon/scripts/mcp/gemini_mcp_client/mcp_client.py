@@ -18,7 +18,7 @@
 # server_params = StdioServerParameters(
 #     command="python",
 #     args=[
-#           "/Users/sameer/db-hackathon-2025/db-hackathon/scripts/mcp/gemini-mcp-server/server.py"
+#           "/Users/sameer/db-hackathon-2025/db-hackathon/scripts/mcp/gemini-mcp_server/server.py"
 #         ]
 # )
 

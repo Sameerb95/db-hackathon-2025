@@ -3,7 +3,7 @@ import subprocess
 from pydantic import BaseModel
 import asyncio
 
-from scripts.mcp.gemini-mcp-client.mcp-client import MCPClient
+from scripts.mcp.gemini_mcp_client.mcp_client import MCPClient
 
 router = APIRouter()
 
@@ -17,7 +17,7 @@ class MCPServerResponse(BaseModel):
 def get_mcp_server_response(request: MCPServerRequest) -> MCPServerResponse:
     try:
         command = [
-            "uv run scripts/mcp/gemini-mcp-client/mcp-client.py scripts/mcp/gemini-mcp-server/server.py"
+            "uv run scripts/mcp/gemini_mcp_client/mcp_client.py scripts/mcp/gemini_mcp_server/server.py"
         ]
         result = subprocess.run(command, capture_output=True, text=True)
         if result.returncode != 0:
