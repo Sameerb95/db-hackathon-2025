@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, DateTime, create_engine, Column, Integer, String, PrimaryKeyConstraint
+from sqlalchemy import Boolean, DateTime, Float, create_engine, Column, Integer, String, PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -53,7 +53,7 @@ class Farmer(Base):
     total_loans_remaining = Column(Integer)
     total_loans_defaulted = Column(Integer)
     average_interest_rate = Column(Integer)
-    confidence_score = Column(Integer)
+    confidence_score = Column(Float)
     state = Column(String)
     city = Column(String)
     password_hash = Column(String, nullable=False)

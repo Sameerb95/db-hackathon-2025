@@ -25,7 +25,7 @@ class FarmerService:
             total_loans_remaining=0,
             total_loans_defaulted=0,
             average_interest_rate=0,
-            confidence_score=40,
+            confidence_score=5.0,
             state=data['state'],
             city=data['city']
         )

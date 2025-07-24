@@ -52,7 +52,7 @@ class FarmerRepository:
         interest_factor = min(avg_interest_rate / 100, 1)
 
         new_score = (ratio_repaid * 0.6 + interest_factor * 0.4) * 100
-        farmer.score = round(new_score, 2)
+        farmer.confidence_score = round(new_score, 2)
         self.db.commit()
         self.db.refresh(farmer)
         return farmer.confidence_score
