@@ -58,8 +58,8 @@ class ProjectService:
     def get_all_active_projects(self):
         return self.project_repository.get_all_active_projects()
     
-    def get_project_by_id(self, project_id: int):
-        return self.project_repository.get_project_by_id(project_id)
+    def get_project_by_id(self, farmer_aadhar_id: str, project_id: int):
+        return self.project_repository.get_project_by_id(farmer_aadhar_id, project_id)
 
     def get_farmer_aadhar_id_by_project_id(self, project_id: int):
         return self.project_repository.get_farmer_aadhar_id_by_project_id(project_id) 

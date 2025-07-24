@@ -16,6 +16,15 @@ class FarmerRepository:
     def get_all_farmers(self):
         return self.db.query(Farmer).all()
 
+    def update_farmer(self, aadhar_id: str, data: dict):
+        farmer = self.get_farmer_by_id(aadhar_id)
+        if farmer:
+            for key, value in data.items():
+                setattr(farmer, key, value)
+            self.db.commit()
+            self.db.refresh(farmer)
+        return farmer
+
     def update_confidence_score(self, aadhar_id: str):
         """
         Updates the confidence score of the farmer
