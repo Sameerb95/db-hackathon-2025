@@ -1,6 +1,9 @@
 # # from brownie import AgroFundConnect, accounts
 from brownie import project, network, accounts
+import subprocess
+import asyncio
 from backend.services.farmer_service import FarmerService
+from scripts.mcp.gemini_mcp_client.mcp_client import MCPClient
 
 farmer_service = FarmerService()
 
@@ -66,3 +69,26 @@ def get_farmer_wallet_balance(aadhar_id:str):
 def get_count():
     contract, _ = get_contract_address_from_file()
     return contract.getProjectsCount()
+
+def get_chat_response(query: str) -> str:
+    """
+    Get a response from the MCP server for a given query.
+    
+    Args:
+        query (str): The query to send to the MCP server.
+    
+    Returns:
+        str: The response from the MCP server.
+    """
+    try:
+        command = [
+            "uv", "run", "scripts/mcp/gemini_mcp_client/mcp_client.py", "scripts/mcp/gemini_mcp_server/server.py"
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise Exception(f"Error creating project: {result}")
+    except Exception as e:
+        return str(e)
+    client = MCPClient()
+    response = asyncio.run(client.chat_query(query=query))
+    return response
