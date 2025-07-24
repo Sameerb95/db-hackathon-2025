@@ -11,6 +11,8 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 # Create a configured "Session" class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+_db_session = None
+
 # Base class for models
 Base = declarative_base()
 
@@ -67,6 +69,12 @@ class Transaction(Base):
     status = Column(String)
     timestamp = Column(DateTime)
 
-# Create the tables in the database
+
+def get_session():
+    global _db_session
+    if _db_session is None or not _db_session.is_active:
+        _db_session = SessionLocal()
+    return _db_session
+
 def create_tables():
     Base.metadata.create_all(bind=engine)

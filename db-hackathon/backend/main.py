@@ -27,7 +27,7 @@ else:
 loaded_proj.load_config()
 
 
-
+create_tables()
 
 app.include_router(
     create_project.router, prefix="/create_project", tags=["create_project"]

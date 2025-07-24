@@ -44,7 +44,7 @@ def get_commodity_price(name: str, commodity: str) -> str:
     sending_commodity = commodity.title()
     api_key = os.getenv("MANDI_API_KEY")
     try:
-        user_location = get_user_location(sending_name)
+        user_location = get_user_location_from_database(sending_name)
         state = user_location["state"]
         district = user_location["district"]
 
@@ -79,7 +79,7 @@ def get_weather_forecast(name: str) -> str:
         str: A formatted weather forecast for the next 5 days for the user's district.
     """
     try:
-        user_location = get_user_location(name)
+        user_location = get_user_location_from_database(name)
         district = user_location["district"]
 
         API_KEY = "9b5f97f06cfe4a5482f200910252207"
@@ -130,6 +130,23 @@ def get_user_location(name: str) -> dict:
     if name not in user_map:
         raise ValueError(f"Unknown user: {name}")
     return user_map[name]
+
+
+def get_user_location_from_database(name: str) -> dict:
+    """
+    Look up the user's location (state and district) based on their name.
+    
+    Args:
+        name (str): The user's name.
+    """
+    import sys
+    import os
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
+    from backend.database import get_session
+    from backend.repositories.farmer_repository import FarmerRepository
+    farmer_repository = FarmerRepository()
+    farmer = farmer_repository.get_farmer_by_name(name)
+    return {"state": farmer.state, "district": farmer.city}
 
 
 def clean_price_data(records: list) -> str:

@@ -12,7 +12,7 @@ class InvestProjectRequest(BaseModel):
     aadhar_id:str
     project_id: int
     amount: int
-    investor_account: str 
+    investor_aadhar_id: str 
 
 @router.post("/")
 def invest_in_project(request: InvestProjectRequest):
@@ -20,7 +20,7 @@ def invest_in_project(request: InvestProjectRequest):
         project_service = ProjectService()
         transaction_service = TransactionService()
         farmer_service = FarmerService()
-        investor_wallet_address = farmer_service.get_farmer_wallet_address(request.investor_account)
+        _,investor_wallet_address = farmer_service.get_farmer_contract_address(request.investor_aadhar_id)
 
         contract_address, wallet_address = farmer_service.get_farmer_contract_address(request.aadhar_id)
 
@@ -38,7 +38,7 @@ def invest_in_project(request: InvestProjectRequest):
             print(traceback.format_exc())
             raise Exception(f"Error investing in project: {result}")
         transaction_id = result.stdout.split("Investment successful! Transaction hash:")[1].strip()   
-        transaction_service.create_transaction(transaction_id,request.aadhar_id, request.investor_account, request.amount, request.project_id)
+        transaction_service.create_transaction(transaction_id,request.aadhar_id, request.investor_aadhar_id, request.amount, request.project_id)
 
         project_service.invest_in_project(request.aadhar_id,request.project_id, request.amount)
         return {"message": "Investment successful!","transaction_hash":transaction_id}

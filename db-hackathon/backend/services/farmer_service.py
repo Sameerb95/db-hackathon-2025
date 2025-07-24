@@ -59,7 +59,7 @@ class FarmerService:
             f.write(str(idx))
                 
         command = [
-            "brownie", "run", "scripts/deploy.py", "main",
+            "brownie", "run", "scripts/blockchain/deploy.py", "main",
             str(idx),
             "--network", "ganache"
         ]
@@ -87,15 +87,12 @@ class FarmerService:
         farmer.total_loans += amount
         self.farmer_repository.update_farmer(aadhar_id, {'total_loans': farmer.total_loans})
 
-    def update_total_loans_repaid(self,aadhar_id:str):
+    def update_total_loans_repaid(self,aadhar_id:str,amount_repaid:int):
         farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
-        amount_repaid = self.get_amount_repaid(aadhar_id)
-        farmer.total_loans_repaid += amount_repaid
+        farmer.total_loans_repaid += int(amount_repaid)
         self.farmer_repository.update_farmer(aadhar_id, {'total_loans_repaid': farmer.total_loans_repaid})
 
-    def get_amount_repaid(self,aadhar_id:str):
-        farmer = self.farmer_repository.get_farmer_by_aadhar_id(aadhar_id)
-        return farmer.amount_raised
+  
 
         
     

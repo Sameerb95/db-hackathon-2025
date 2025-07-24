@@ -109,5 +109,5 @@ def main(contract_address, wallet_address, project_id):
     print("✅ All profits have been disbursed to investors")
     
     final_balance = get_account_balance(contract, account)
-    print(f"Amount spent on profits: {wallet_balance - final_balance} INR")
+    print(f"PROFIT_AMOUNT:{wallet_balance - final_balance}")
 

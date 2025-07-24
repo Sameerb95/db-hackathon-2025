@@ -1,8 +1,8 @@
-from backend.database import Transaction, SessionLocal
+from backend.database import Transaction, SessionLocal,get_session
 
 class TransactionRepository:
     def __init__(self):
-        self.db = SessionLocal()
+        self.db = get_session()
 
     def add_transaction(self, transaction: Transaction):
         self.db.add(transaction)

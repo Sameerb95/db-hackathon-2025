@@ -4,6 +4,7 @@ import subprocess
 import asyncio
 from backend.services.farmer_service import FarmerService
 from scripts.mcp.gemini_mcp_client.mcp_client import MCPClient
+import json
 
 farmer_service = FarmerService()
 
@@ -109,7 +110,6 @@ def get_project_score(project_details: dict) -> dict:
     Returns:
         dict: A dictionary containing the score and reasoning.
     """
-    initialise_mcp_server()
-    # Ensure the MCPClient is initialized and ready to use
-    response = asyncio.run(MCPClient().get_project_score(project_details=project_details))
+    client = MCPClient()
+    response = asyncio.run(client.get_project_score(project_details=project_details))
     return response

@@ -1,8 +1,8 @@
-from backend.database import Project, SessionLocal
+from backend.database import Project, SessionLocal, get_session
 
 class ProjectRepository:
     def __init__(self):
-        self.db = SessionLocal()
+        self.db = get_session()
 
     def add_project(self, project: Project):
         self.db.add(project)

@@ -1,8 +1,9 @@
-from backend.database import Farmer, SessionLocal, Project
+from backend.database import Farmer, SessionLocal, Project,get_session
+from sqlalchemy import func
 
 class FarmerRepository:
     def __init__(self):
-        self.db = SessionLocal()
+        self.db = get_session()
 
     def add_farmer(self, farmer: Farmer):
         self.db.add(farmer)
@@ -15,6 +16,9 @@ class FarmerRepository:
 
     def get_farmer_by_aadhar_id(self, aadhar_id: str):
         return self.db.query(Farmer).filter(Farmer.aadhar_id == aadhar_id).first()
+    
+    def get_farmer_by_name(self, name: str):
+        return self.db.query(Farmer).filter(Farmer.name == name).first()
 
     def update_farmer(self, aadhar_id: str, data: dict):
         farmer = self.get_farmer_by_aadhar_id(aadhar_id)
