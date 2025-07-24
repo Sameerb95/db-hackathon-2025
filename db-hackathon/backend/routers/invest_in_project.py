@@ -12,7 +12,7 @@ class InvestProjectRequest(BaseModel):
     aadhar_id:str
     project_id: int
     amount: int
-    investor_account: int 
+    investor_account: str 
 
 @router.post("/")
 def invest_in_project(request: InvestProjectRequest):
@@ -20,7 +20,7 @@ def invest_in_project(request: InvestProjectRequest):
         project_service = ProjectService()
         transaction_service = TransactionService()
         farmer_service = FarmerService()
-
+        investor_wallet_address = farmer_service.get_farmer_wallet_address(request.investor_account)
 
         contract_address, wallet_address = farmer_service.get_farmer_contract_address(request.aadhar_id)
 
@@ -30,7 +30,7 @@ def invest_in_project(request: InvestProjectRequest):
             str(wallet_address),
             str(request.project_id),
             str(request.amount),
-            str(request.investor_account),
+            str(investor_wallet_address),
             "--network", "ganache"
         ]
         result = subprocess.run(command, capture_output=True, text=True)
