@@ -6,7 +6,8 @@ from backend.routers import (
     get_projects,
     login,
     register,
-    dashboard
+    dashboard,
+    mcp_server
     )
 
 from backend.database import create_tables
@@ -39,3 +40,4 @@ app.include_router(
 app.include_router(
     dashboard.router, prefix="/dashboard", tags=["dashboard"]
 )
+app.include_router(mcp_server.router, prefix="/mcp_server", tags=["mcp_server"])

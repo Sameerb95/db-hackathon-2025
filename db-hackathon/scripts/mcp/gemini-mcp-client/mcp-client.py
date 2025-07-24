@@ -183,21 +183,17 @@ class MCPClient:
         return "\n".join(final_text)
 
 
-    async def chat_loop(self):
-        print("\nMCP Client Started! Type 'quit' to exit.")
-
-        while True:
-            query = input("\nQuery: ").strip()
-            if query.lower() == 'quit':
-                break
-
-            try:
-                logging.info("Processing query...")  # Debug
-                response = await self.process_query(query)
-                print("Processing complete.")  # Debug
-                print("\n" + response)
-            except Exception as e:
-                print(f"Error during processing: {e}")
+    async def chat_query(self, query: str) -> str:
+        query = query.strip()
+        try:
+            logging.info("Processing query...")  # Debug
+            response = await self.process_query(query)
+            print("Processing complete.")  # Debug
+            print("\n" + response)
+            return response
+        except Exception as e:
+            print(f"Error during processing: {e}")
+            return str(e)
 
     async def cleanup(self):
         await self.exit_stack.aclose()
