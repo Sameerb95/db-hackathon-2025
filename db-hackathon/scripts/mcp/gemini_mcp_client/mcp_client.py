@@ -127,8 +127,8 @@ class MCPClient:
         self.function_declarations = convert_mcp_tools_to_gemini(tools)
 
 
-    async def process_query(self, query: str) -> str:
-        system_prompt = get_system_prompt()
+    async def process_query(self, query: str, prompt_name : str = "default") -> str:
+        system_prompt = get_system_prompt(prompt_name=prompt_name)
         full_prompt = f"{system_prompt}\n\n{query}"
 
         conversation = [
@@ -182,6 +182,40 @@ class MCPClient:
 
         return "\n".join(final_text)
 
+    def extract_score_and_reasoning(self, response_text: str) -> dict:
+        """
+        Extracts the score and reasoning from the project_score prompt response text.
+        Returns a dictionary with keys 'score' (int) and 'reasoning' (str).
+        """
+        import re
+
+        score = None
+        reasoning = ""
+
+        # Try to find score out of 100 in the response text
+        score_match = re.search(r"(\d{1,3})\s*(?:out of|\/|%)\s*100", response_text)
+        if score_match:
+            score = int(score_match.group(1))
+            if score > 100:
+                score = 100
+            elif score < 0:
+                score = 0
+
+        # Try to extract reasoning - assume reasoning follows keywords like "reason", "explanation", or after score
+        reasoning_match = re.search(r"(?:reason(?:ing)?|explanation|because|इसलिए|कारण|क्योंकि)[\s:\-]*([\s\S]+)", response_text, re.IGNORECASE)
+        if reasoning_match:
+            reasoning = reasoning_match.group(1).strip()
+            # Limit reasoning length to first paragraph or 300 chars
+            reasoning = reasoning.split("\n")[0]
+            if len(reasoning) > 300:
+                reasoning = reasoning[:300] + "..."
+
+        # If no explicit reasoning found, fallback to first 300 chars of response
+        if not reasoning:
+            reasoning = response_text.strip()[:300]
+
+        return {"score": score, "reasoning": reasoning}
+
 
     async def chat_query(self, query: str) -> str:
         query = query.strip()
@@ -197,6 +231,28 @@ class MCPClient:
 
     async def cleanup(self):
         await self.exit_stack.aclose()
+
+    async def get_project_score(self, project_details: dict) -> dict:
+        """
+        Get a score for the project based on its details.
+        returns a dictionary with 'score' (int) and 'reasoning' (str).
+        The score is out of 100, and reasoning is a brief explanation.
+        """
+        query = f"The details of the project is as follows: {json.dumps(project_details)}"
+        try:
+            response = await self.chat_query(query=query, prompt_name="project_score")
+            response_dict = {"score": 0, "reasoning": "No response from server."}
+            if response:
+                response_dict = self.extract_score_and_reasoning(response)
+                if response_dict["score"] is None:
+                    response_dict["score"] = 0
+                if not response_dict["reasoning"]:
+                    response_dict["reasoning"] = "No reasoning provided."
+            return response
+        except Exception as e:
+            print(f"Error getting project score: {e}")
+            return str(e)
+
 
 def clean_schema(schema):
     if isinstance(schema, dict):
