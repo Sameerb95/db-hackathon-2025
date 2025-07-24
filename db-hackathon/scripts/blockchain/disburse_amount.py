@@ -73,9 +73,9 @@ def get_account_balance(contract, account):
     balance_inr = contract.weiToINR(balance)
     return balance_inr
 
-def main(project_id):
-    project_id = int(project_id)
-    contract, account = get_contract_address_from_file()
+def main(contract_address, wallet_address, project_id):
+    
+    contract, account = get_contract_address_from_file(contract_address, wallet_address)
     print(contract)
     print(account)
     project = contract.getProject(project_id)
@@ -85,18 +85,12 @@ def main(project_id):
     profit_share_percentage = project[7]
     completed = project[8]
 
-    print(f"Project ID: {project_id}")
-    print(f"Farmer: {farmer}")
-    print(f"Amount Raised: {amount_raised_inr} INR ")
-    print(f"Profit Share Percentage: {profit_share_percentage}%")
-    print(f"Project Completed: {completed}")
-
     total_profit_inr = (amount_raised_inr * profit_share_percentage) / 100
     
     print(f"Total Profit to be distributed: {total_profit_inr} INR ")
 
     wallet_balance = get_account_balance(contract, account)
-    print(f"Wallet balance: {wallet_balance} INR ")
+
 
     if wallet_balance < total_profit_inr:
         print(f"Not enough balance to disburse profits. Need {total_profit_inr} wei, have {wallet_balance} wei")
@@ -115,6 +109,5 @@ def main(project_id):
     print("✅ All profits have been disbursed to investors")
     
     final_balance = get_account_balance(contract, account)
-    print(f"Final wallet balance: {final_balance} INR ")
     print(f"Amount spent on profits: {wallet_balance - final_balance} INR")
 
