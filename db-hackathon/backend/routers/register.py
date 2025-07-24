@@ -15,7 +15,7 @@ class FarmerRegister(BaseModel):
     name: str
     email: str
     phone: str
-    password: str
+    password_hash: str
     state: str
     city: str
 

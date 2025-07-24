@@ -24,6 +24,7 @@ class Project(Base):
     name = Column(String, index=True)
     description = Column(String)
     amount_needed = Column(Integer)
+    amount_raised = Column(Integer)
     interest_rate = Column(Integer)
     farmer_aadhar_id = Column(String, index=True)
     duration_in_months = Column(Integer)
@@ -56,7 +57,7 @@ class Farmer(Base):
 
 class Transaction(Base):
     __tablename__ = "transactions"
-    transaction_id = Column(Integer, primary_key=True, index=True)
+    transaction_id = Column(String, primary_key=True, index=True)
     farmer_aadhar_id = Column(String, index=True)
     investor_aadhar_id = Column(String, index=True)
     amount = Column(Integer)

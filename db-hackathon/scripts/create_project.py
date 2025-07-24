@@ -20,7 +20,10 @@ def main(contract_address,wallet_address,project_name, project_description, amou
 
     tx.wait(1)
     # Get the latest project ID (assuming it's count - 1)
-    project_id = contract.getProjectsCount() - 1
-    logging.info(f"Project ID: {project_id}")
-    return project_id
+    print(tx)
+    tx.wait(1)
+
+    print("Project created! Transaction hash:", tx.txid)
+
+    return tx.txid
 

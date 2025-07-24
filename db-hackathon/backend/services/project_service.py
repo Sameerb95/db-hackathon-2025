@@ -15,6 +15,7 @@ class ProjectService:
             name=data['name'],
             description=data['description'],
             amount_needed=data['amount_needed'],
+            amount_raised=0,
             interest_rate=data['interest_rate'],
             farmer_aadhar_id=data['farmer_aadhar_id'],
             duration_in_months=data['duration_in_months'],
@@ -25,21 +26,16 @@ class ProjectService:
         )
         return self.project_repository.add_project(project)
     
-    def invest_in_project(self, project_id: int, amount: int):
-        project = self.get_project_by_id(project_id)
+    def invest_in_project(self, aadhar_id: str, project_id: int, amount: int):
+        project = self.get_project_by_farmer_aadhar_id_and_project_id(aadhar_id, project_id)
         if project:
             if project.is_active:
                 project.amount_needed -= amount
+                project.amount_raised += amount
                 self.project_repository.update_project(project_id, {'amount_needed': project.amount_needed})
                 if project.amount_needed == 0:
                     project.is_active = False
-                    project.amount_repaid_yn = True
-                    farmer_aadhar_id = self.get_farmer_aadhar_id_by_project_id(project_id)
-                    farmer = self.farmer_repository.get_farmer_by_id(farmer_aadhar_id)
-                    farmer.total_loans += 1
-                    farmer.total_loans_remaining += 1
-                    self.farmer_repository.update_farmer(farmer_aadhar_id, {'total_loans': farmer.total_loans, 'total_loans_remaining': farmer.total_loans_remaining})
-                    self.project_repository.update_project(project_id, {'is_active': project.is_active, 'amount_repaid_yn': project.amount_repaid_yn})
+                    self.project_repository.update_project(project_id, {'is_active': project.is_active})
                     return True
             else:
                 print("Project is not active")
@@ -47,9 +43,17 @@ class ProjectService:
         else:
             print("Project not found")
             return False
+    
+    def repay_amount(self,aadhar_id:str,project_id:int):
+            project = self.get_project_by_farmer_aadhar_id_and_project_id(aadhar_id, project_id)
+            if project.amount_repaid_yn:
+                print("Project already repaid")
+                return False
+            else:
+                project.amount_repaid_yn = True
+                self.project_repository.update_project(project_id, {'amount_repaid_yn': project.amount_repaid_yn})
+                return True
 
-
-        
 
     def get_all_active_projects(self):
         return self.project_repository.get_all_active_projects()
@@ -62,6 +66,9 @@ class ProjectService:
     
     def get_project_by_farmer_aadhar_id(self, farmer_aadhar_id: str):
         return self.project_repository.get_projects_by_farmer_aadhar_id(farmer_aadhar_id)
+
+    def get_project_by_farmer_aadhar_id_and_project_id(self, farmer_aadhar_id: str, project_id: int):
+        return self.project_repository.get_project_by_farmer_aadhar_id_and_project_id(farmer_aadhar_id, project_id)
     
     def get_project_by_crop_type(self, crop_type: str):
         return self.project_repository.get_project_by_crop_type(crop_type)

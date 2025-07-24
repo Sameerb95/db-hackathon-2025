@@ -12,7 +12,7 @@ class CreateProjectRequest(BaseModel):
     project_name: str
     project_description: str
     amount_needed: int
-    profit_share: int
+    interest_rate: int
     farmer_aadhar_id: str
     duration_in_months: int
     crop_type: str
@@ -46,7 +46,7 @@ def create_project(request: CreateProjectRequest):
                 'name': request.project_name,
                 'description': request.project_description,
                 'amount_needed': request.amount_needed,
-                'interest_rate': request.profit_share,
+                'interest_rate': request.interest_rate,
                 'farmer_aadhar_id': request.farmer_aadhar_id,
                 'duration_in_months': request.duration_in_months,
                 'crop_type': request.crop_type,
@@ -55,4 +55,5 @@ def create_project(request: CreateProjectRequest):
             project_service.create_project(project_data)
             return {"message": "Project created successfully!", "transaction_hash": result.stdout.split("Project created!")[1].strip()}
     except Exception as e:
+        traceback.print_exc()
         return {"error": str(e)}
