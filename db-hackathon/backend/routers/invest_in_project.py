@@ -25,7 +25,7 @@ def invest_in_project(request: InvestProjectRequest):
         contract_address, wallet_address = farmer_service.get_farmer_contract_address(request.aadhar_id)
 
         command = [
-            "brownie", "run", "scripts/invest_in_project.py", "main",
+            "brownie", "run", "scripts/blockchain/invest_in_project.py", "main",
             str(contract_address),
             str(wallet_address),
             str(request.project_id),

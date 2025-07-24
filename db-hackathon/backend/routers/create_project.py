@@ -25,7 +25,7 @@ def create_project(request: CreateProjectRequest):
 
     try:
         command = [
-            "brownie", "run", "scripts/create_project.py", "main",
+            "brownie", "run", "scripts/blockchain/create_project.py", "main",
                 str(contract_address),
                 str(wallet_address),
                 str(request.project_name),
