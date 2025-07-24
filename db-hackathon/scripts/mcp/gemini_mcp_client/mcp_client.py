@@ -87,7 +87,7 @@ from google.genai.types import Tool, FunctionDeclaration
 from google.genai.types import GenerateContentConfig
 
 from dotenv import load_dotenv  
-from system_prompt import get_system_prompt
+from scripts.mcp.gemini_mcp_client.system_prompt import get_system_prompt
 import logging
 
 load_dotenv()
