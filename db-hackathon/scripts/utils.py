@@ -70,6 +70,18 @@ def get_count():
     contract, _ = get_contract_address_from_file()
     return contract.getProjectsCount()
 
+def initialise_mcp_server():
+    try:
+        command = [
+            "uv", "run", "scripts/mcp/gemini_mcp_client/mcp_client.py", "scripts/mcp/gemini_mcp_server/server.py"
+        ]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode != 0:
+            raise Exception(f"Error creating project: {result}")
+    except Exception as e:
+        print(str(e))
+        raise e
+
 def get_chat_response(query: str) -> str:
     """
     Get a response from the MCP server for a given query.
@@ -80,15 +92,24 @@ def get_chat_response(query: str) -> str:
     Returns:
         str: The response from the MCP server.
     """
-    try:
-        command = [
-            "uv", "run", "scripts/mcp/gemini_mcp_client/mcp_client.py", "scripts/mcp/gemini_mcp_server/server.py"
-        ]
-        result = subprocess.run(command, capture_output=True, text=True)
-        if result.returncode != 0:
-            raise Exception(f"Error creating project: {result}")
-    except Exception as e:
-        return str(e)
+    initialise_mcp_server()
     client = MCPClient()
     response = asyncio.run(client.chat_query(query=query))
+    return response
+
+def get_project_score(project_details: dict) -> dict:   
+    """
+    Get a score for the project based on its details.
+    Returns a dictionary with 'score' (int) and 'reasoning' (str).
+    The score is out of 100, and reasoning is a brief explanation.
+    
+    Args:
+        project_details (dict): The details of the project. Required details are : description, amount_needed, intrest_rate, duration_in_months, crop_type, land_area.
+    
+    Returns:
+        dict: A dictionary containing the score and reasoning.
+    """
+    initialise_mcp_server()
+    # Ensure the MCPClient is initialized and ready to use
+    response = asyncio.run(MCPClient().get_project_score(project_details=project_details))
     return response

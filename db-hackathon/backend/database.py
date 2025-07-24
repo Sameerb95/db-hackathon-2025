@@ -32,6 +32,8 @@ class Project(Base):
     amount_repaid_yn = Column(Boolean)
     crop_type = Column(String)
     land_area = Column(Integer)
+    project_score = Column(Integer)
+    score_reasoning = Column(String)
     
 
 class Farmer(Base):
