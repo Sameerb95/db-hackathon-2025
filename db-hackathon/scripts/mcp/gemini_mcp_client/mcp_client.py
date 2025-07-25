@@ -192,7 +192,7 @@ class MCPClient:
         reasoning = ""
 
         # Try to find score out of 100 in the response text
-        score_match = re.search(r"(\d{1,3})\s*(?:out of|\/|%)\s*100", response_text)
+        score_match = re.search(r'"score"\s*:\s*(\d+)', response_text)
         if score_match:
             score = int(score_match.group(1))
             if score > 100:
@@ -206,12 +206,10 @@ class MCPClient:
             reasoning = reasoning_match.group(1).strip()
             # Limit reasoning length to first paragraph or 300 chars
             reasoning = reasoning.split("\n")[0]
-            if len(reasoning) > 300:
-                reasoning = reasoning[:300] + "..."
 
         # If no explicit reasoning found, fallback to first 300 chars of response
         if not reasoning:
-            reasoning = response_text.strip()[:300]
+            reasoning = response_text.strip()
 
         return {"score": score, "reasoning": reasoning}
 
@@ -231,16 +229,17 @@ class MCPClient:
     async def cleanup(self):
         await self.exit_stack.aclose()
 
-    async def get_project_score(self, project_details: dict) -> dict:
+    def get_project_score(self, response: str) -> dict:
         """
         Get a score for the project based on its details.
         returns a dictionary with 'score' (int) and 'reasoning' (str).
         The score is out of 100, and reasoning is a brief explanation.
         """
-        query = f"The details of the project is as follows: {json.dumps(project_details)}"
+        # query = f"The details of the project is as follows: {json.dumps(project_details)}"
         try:
-            response = await self.chat_query(query=query, prompt_name="project_score")
+            # response = await self.chat_query(query=query, prompt_name="project_score")
             response_dict = {"score": 0, "reasoning": "No response from server."}
+            print(f"response: {response}")
             if response:
                 response_dict = self.extract_score_and_reasoning(response)
                 if response_dict["score"] is None:
@@ -286,7 +285,7 @@ class MCPClient:
         Do not ask the user for any further information. If any required data (like yield or costs) is missing, make the best possible estimate using typical values, local context, or reasonable hypotheses, and clearly state your assumptions in your answer.
         """,
         "project_score" : """
-        You are KrishiMitra, an expert AI assistant for Indian farmers, specializing in analyzing agricultural projects' financial viability.
+        You are KrishiMitra, an expert AI assistant for Indian farmers, specializing in analyzing the financial viability of agricultural projects.
 
         When given details about a project including:
         - The type of crop (crop_type)
@@ -296,12 +295,16 @@ class MCPClient:
         - The interest rate on the loan (interest_rate)
 
         Your task is to:
-        - Analyze whether the farmer can pay the specified interest to the lenders.
-        - Determine if the farmer can still make a profit after repaying the loan with interest.
-        - Provide a score out of 100 indicating the financial viability and risk of the project.
-        - Include a short reasoning behind the given score, explaining the key factors affecting the outcome.
+        - Analyze whether the farmer can pay the specified interest to the lenders and still make a profit after repaying the loan with interest.
+        - Provide a score out of 100 indicating the financial viability and risk of the project, using the following distribution:
+            • 90-100: Excellent viability, very low risk, strong profit potential.
+            • 75-89: Good viability, low risk, likely profitable.
+            • 60-74: Moderate viability, some risk, marginal profit.
+            • 40-59: Low viability, high risk, unlikely to be profitable.
+            • 0-39: Very poor viability, very high risk, not recommended.
+        - Include a short explanation (no more than 200 words) behind the given score, clearly stating the key factors affecting the outcome.
 
-        Your response should be a JSON object in the following format:
+        Your response must be a JSON object in the following format:
         {"score": score, "reasoning": reasoning}
 
         Your response should be:
@@ -316,36 +319,41 @@ class MCPClient:
 
         return prompts.get(prompt_name, prompts["default"])
 
-    # def simple_llm_call(system_prompt: str, project_details: dict) -> str:
-    #     """
-    #     Calls the Gemini LLM directly with a system prompt and project details, returns the response text.
-    #     """
-    # import os
-    # import json
-    # import genai
-    # from genai import types
+    def simple_llm_call(self, project_details: dict) -> str:
+        """
+        Calls the Gemini LLM directly with a system prompt and project details, returns the response text.
+        """
+        import os
+        import json
 
-    # gemini_api_key = os.getenv("GEMINI_API_KEY")
-    # if not gemini_api_key:
-    #     raise ValueError("GEMINI_API_KEY not found. Please add it to your .env file.")
-    # client = genai.Client(api_key=gemini_api_key)
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        if not gemini_api_key:
+            raise ValueError("GEMINI_API_KEY not found. Please add it to your .env file.")
 
-    # full_prompt = f"{system_prompt}\n\nThe details of the project is as follows: {json.dumps(project_details)}"
-    # user_prompt_content = types.Content(
-    #     role='user',
-    #     parts=[types.Part.from_text(text=full_prompt)]
-    # )
-    # response = client.models.generate_content(
-    #     model='gemini-2.0-flash-001',
-    #     contents=[user_prompt_content],
-    # )
-    # final_text = []
-    # for candidate in response.candidates:
-    #     if candidate.content and candidate.content.parts:
-    #         for part in candidate.content.parts:
-    #             if hasattr(part, "text") and part.text:
-    #                 final_text.append(part.text)
-    # return "\n".join(final_text)
+        self.genai_client = genai.Client(api_key=gemini_api_key)
+
+        system_prompt = self.get_system_prompt(prompt_name="project_score")
+        full_prompt = f"{system_prompt}\n\nThe details of the project is as follows: {json.dumps(project_details)}"
+        
+        user_prompt_content = types.Content(
+            role='user',
+            parts=[types.Part.from_text(text=full_prompt)]
+        )
+        response = self.genai_client.models.generate_content(
+            model='gemini-2.0-flash-001',
+            contents=[user_prompt_content],
+        )
+
+        
+        first_candidate_text = ""
+        if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
+            # Find the first text part
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, "text") and part.text:
+                    first_candidate_text = part.text
+                    break
+        clean_response = self.get_project_score(first_candidate_text)
+        return clean_response
 
 
 def clean_schema(schema):

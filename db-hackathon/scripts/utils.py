@@ -111,5 +111,5 @@ def get_project_score(project_details: dict) -> dict:
         dict: A dictionary containing the score and reasoning.
     """
     client = MCPClient()
-    response = asyncio.run(client.get_project_score(project_details=project_details))
+    response = client.simple_llm_call(project_details=project_details)
     return response
