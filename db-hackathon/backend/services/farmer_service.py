@@ -79,7 +79,10 @@ class FarmerService:
             return "Farmer not found"
         
     def update_confidence_score(self, aadhar_id: str):
-        return self.farmer_repository.update_confidence_score(aadhar_id)
+        score = 6.0
+        print(f"Score: {score}")
+        self.farmer_repository.update_farmer(aadhar_id, {'confidence_score': score})
+        return score
 
     
     def update_total_loans(self,aadhar_id:str,amount:int):
